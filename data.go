@@ -20,7 +20,7 @@ func fillTables(rootNodes []*TableNode, tableNodes map[string]*TableNode, db *sq
 }
 
 // Generate a sample entry for the table
-func generateSampleEntryData(tableNode *TableNode, depValues map[string]interface{}) (map[string]interface{}, map[string]string) {
+func generateSampleEntryData(tableNode *TableNode, depValues map[string]interface{}, db *sql.DB) (map[string]interface{}, map[string]string) {
 	// Generate test values to insert into the table
 	sampleValues := make(map[string]interface{})
 	sampleTypes := make(map[string]string)
@@ -48,6 +48,15 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 
 		fmt.Println("Filling column:", column.ColumnName, "with type:", column.DataType)
 		sampleTypes[column.ColumnName] = column.DataType
+
+		// First check if the column is an enum
+		if CheckIfTypeIsEnum(column.DataType, db) {
+			// Get the enum values
+			enumOptions := GetEnumOptions(column.DataType, db)
+			// Randomly select an enum value
+			sampleValues[column.ColumnName] = enumOptions[rand.Intn(len(enumOptions))]
+			continue
+		}
 
 		// Generate sample data based on the data type
 		switch column.DataType {
@@ -97,7 +106,7 @@ func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.D
 		depValues := getDepValues(tableNode, tableNodes, db)
 
 		// Generate test values to insert into the table
-		sampleValues, sampleTypes := generateSampleEntryData(tableNode, depValues)
+		sampleValues, sampleTypes := generateSampleEntryData(tableNode, depValues, db)
 
 		// Construct and SQL insert statement to insert the sample data
 		insertStatement := fmt.Sprintf("INSERT INTO %s (", tableNode.TableName)
@@ -188,6 +197,11 @@ func getDepValues(tableNode *TableNode, tableNodes map[string]*TableNode, db *sq
 
 		if err != nil {
 			panic(err)
+		}
+
+		// Panic if the rows are empty
+		if !rows.Next() {
+			panic(fmt.Sprintf("No rows in table: %s", parentTableName))
 		}
 
 		// Get the column value
