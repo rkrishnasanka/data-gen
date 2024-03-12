@@ -2,11 +2,10 @@ package main
 
 // Create a dependency tree to capture what tables are dependent on what other tables
 type TableNode struct {
-	TableName             string
-	Columns               []*TableColumn
-	Children              []*TableNode
-	Parents               []*TableNode
-	ForeignKeyConstraints []*ForeignKeyConstraint
+	TableName           string
+	Columns             []*TableColumn
+	Children            []*TableNode
+	ParentRelationships []*ForeignKeyConstraint
 }
 
 // Create a struct to capture the column name and data type
@@ -26,10 +25,9 @@ type ForeignKeyConstraint struct {
 // Add a method to the TableNode struct to add a child node
 func (t *TableNode) AddChild(child *TableNode, constraintName string, parentColumn string, childColumn string) {
 	t.Children = append(t.Children, child)
-	child.Parents = append(child.Parents, t)
 
 	// Add the foreign key constraint to the parent and child nodes
-	child.ForeignKeyConstraints = append(child.ForeignKeyConstraints, &ForeignKeyConstraint{
+	child.ParentRelationships = append(child.ParentRelationships, &ForeignKeyConstraint{
 		ConstraintName: constraintName,
 		ParentTable:    t.TableName,
 		ParentColumn:   parentColumn,
@@ -56,7 +54,7 @@ func generateTopologicalSort(tableNodes map[string]*TableNode) []*TableNode {
 
 	// Iterate over the table nodes and identify the roots
 	for _, tableNode := range tableNodes {
-		if len(tableNode.Parents) == 0 {
+		if len(tableNode.ParentRelationships) == 0 {
 			// Start DFS from the root node
 			topologicalSort(tableNode, &stack, visited)
 		}

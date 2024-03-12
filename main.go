@@ -39,15 +39,18 @@ func generateDependencyTree(db *sql.DB, tableNodes map[string]*TableNode) {
 		}
 		fmt.Printf("%s.%s.%s: %s\n", schema, table, column, dataType)
 
+		// Create the full table name (use this only for any logic)
+		fulltableName := fmt.Sprintf("%s.%s", schema, table)
+
 		// Create a new TableNode if it doesn't exist
-		if _, ok := tableNodes[table]; !ok {
-			tableNodes[table] = &TableNode{
-				TableName: table,
+		if _, ok := tableNodes[fulltableName]; !ok {
+			tableNodes[fulltableName] = &TableNode{
+				TableName: fulltableName,
 			}
 		}
 
 		// Add the column to the TableNode corresponding to the table
-		tableNodes[table].AddColumn(&TableColumn{
+		tableNodes[fulltableName].AddColumn(&TableColumn{
 			ColumnName: column,
 			DataType:   dataType,
 		})
@@ -95,15 +98,18 @@ func generateDependencyTree(db *sql.DB, tableNodes map[string]*TableNode) {
 			}
 		}
 
+		// Create the full table name
+		fullTableName := fmt.Sprintf("%s.%s", foreignSchema, foreignTable)
+
 		// Create a new TableNode if it doesn't exist
-		if _, ok := tableNodes[foreignTable]; !ok {
-			tableNodes[foreignTable] = &TableNode{
-				TableName: foreignTable,
+		if _, ok := tableNodes[fullTableName]; !ok {
+			tableNodes[fullTableName] = &TableNode{
+				TableName: fullTableName,
 			}
 		}
 
 		// Add the foreign table as a child of the table
-		tableNodes[foreignTable].AddChild(tableNodes[table], "fk_constraint_name", foreignColumn, column)
+		tableNodes[fullTableName].AddChild(tableNodes[table], "fk_constraint_name", foreignColumn, column)
 	}
 
 }
@@ -112,7 +118,7 @@ func generateDependencyTree(db *sql.DB, tableNodes map[string]*TableNode) {
 func identifyRoots(rootNodes *[]*TableNode, tableNodes map[string]*TableNode) {
 	// Iterate over the table nodes and identify the roots
 	for _, tableNode := range tableNodes {
-		if len(tableNode.Parents) == 0 {
+		if len(tableNode.ParentRelationships) == 0 {
 			*rootNodes = append(*rootNodes, tableNode)
 		}
 	}
@@ -122,19 +128,6 @@ func identifyRoots(rootNodes *[]*TableNode, tableNodes map[string]*TableNode) {
 	for _, rootNode := range *rootNodes {
 		fmt.Println(rootNode.TableName)
 	}
-}
-
-func fillTables(rootNodes []*TableNode, tableNodes map[string]*TableNode) {
-	// Iterate over the root nodes and fill the tables
-	fmt.Println("\nFilling Tables for a new traversal:")
-	for _, rootNode := range rootNodes {
-		fmt.Println("Filling table:", rootNode.TableName)
-		fillTable(rootNode, tableNodes)
-	}
-}
-
-func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode) {
-	fmt.Println("Filling table:", tableNode.TableName)
 }
 
 func main() {
@@ -160,8 +153,16 @@ func main() {
 	// Generate the dependency tree
 	generateDependencyTree(db, tableNodes)
 
-	traversals := generateTopologicalSort(tableNodes)
+	// Identify the order of the tables to be filled
+	orderedTables := generateTopologicalSort(tableNodes)
 
-	fillTables(traversals, tableNodes)
+	// Print out the order of the tables to be filled
+	fmt.Println("\nOrder of Tables to be Filled:")
+	for _, tableNode := range orderedTables {
+		fmt.Println(tableNode.TableName)
+	}
+
+	// Fill the tables with sample data
+	fillTables(orderedTables, tableNodes, db)
 
 }
