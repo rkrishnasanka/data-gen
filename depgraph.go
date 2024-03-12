@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/golang-collections/collections/stack"
 )
 
@@ -103,6 +105,53 @@ func dfsTraverse(tableNode *TableNode, fillOrder *[]*TableNode, visited map[*Tab
 func reverse(nodes []*TableNode) {
 	for i, j := 0, len(nodes)-1; i < j; i, j = i+1, j-1 {
 		nodes[i], nodes[j] = nodes[j], nodes[i]
+	}
+}
+
+func PrintNode(tableNode *TableNode, level int) {
+	// Print the table name
+	for i := 0; i < level; i++ {
+		print("    ")
+	}
+	fmt.Println(tableNode.TableName)
+	fmt.Println("Foreign Key Constraints:")
+
+	// Print the foreign key constraints
+	for _, constraint := range tableNode.ParentRelationships {
+		for i := 0; i < level; i++ {
+			fmt.Print("    ")
+		}
+		fmt.Printf("%s: %s.%s -> %s.%s\n", constraint.ConstraintName, constraint.ParentTable, constraint.ParentColumn, tableNode.TableName, constraint.ChildColumn)
+	}
+
+}
+
+func PrintTree(tableNodes map[string]*TableNode) {
+	// Identify the root nodes
+	rootNodes := make([]*TableNode, 0)
+
+	// Identify the root nodes
+	identifyRoots(&rootNodes, tableNodes)
+
+	// Go through each of the root nodes
+	for _, rootNode := range rootNodes {
+		// Print new tree
+		fmt.Println("\nNew Tree:")
+
+		// Print the root node
+		PrintNode(rootNode, 0)
+
+		// Print the children
+		printChildren(rootNode, 1)
+
+	}
+}
+
+func printChildren(tableNode *TableNode, level int) {
+	// Print the children
+	for _, child := range tableNode.Children {
+		PrintNode(child, level)
+		printChildren(child, level+1)
 	}
 }
 

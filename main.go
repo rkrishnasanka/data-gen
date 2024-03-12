@@ -97,15 +97,8 @@ func generateDependencyTree(db *sql.DB, tableNodes map[string]*TableNode) {
 		// Create the full table name (foreign)
 		foreignTableName := fmt.Sprintf("%s.%s", foreignSchema, foreignTable)
 
-		// Create a new TableNode if it doesn't exist
-		if _, ok := tableNodes[currentTableName]; !ok {
-			tableNodes[currentTableName] = &TableNode{
-				TableName: currentTableName,
-			}
-		}
-
 		// Add the foreign table as a child of the table
-		tableNodes[currentTableName].AddChild(tableNodes[foreignTableName], constraintName, foreignColumn, column)
+		tableNodes[foreignTableName].AddChild(tableNodes[currentTableName], constraintName, foreignColumn, column)
 	}
 
 }
@@ -151,6 +144,9 @@ func main() {
 
 	// Identify the order of the tables to be filled
 	orderedTables := generateFillOrder(tableNodes)
+
+	// Print the tree
+	PrintTree(tableNodes)
 
 	// Print out the order of the tables to be filled
 	fmt.Println("\nOrder of Tables to be Filled:")
