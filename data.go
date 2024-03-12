@@ -20,7 +20,7 @@ func fillTables(rootNodes []*TableNode, tableNodes map[string]*TableNode, db *sq
 }
 
 // Generate a sample entry for the table
-func generateSampleEntry(tableNode *TableNode, depValues map[string]interface{}) (map[string]interface{}, map[string]string) {
+func generateSampleEntryData(tableNode *TableNode, depValues map[string]interface{}) (map[string]interface{}, map[string]string) {
 	// Generate test values to insert into the table
 	sampleValues := make(map[string]interface{})
 	sampleTypes := make(map[string]string)
@@ -29,6 +29,20 @@ func generateSampleEntry(tableNode *TableNode, depValues map[string]interface{})
 	for _, column := range tableNode.Columns {
 		// SKip id columns
 		if column.ColumnName == "id" {
+			continue
+		}
+
+		// SKip if the column is a dependent column
+		if _, ok := depValues[column.ColumnName]; ok {
+			continue
+		}
+
+		// If the column is a dependent column, get the value from the dependent values
+		if value, ok := depValues[column.ColumnName]; ok {
+			sampleValues[column.ColumnName] = value
+			sampleTypes[column.ColumnName] = column.DataType
+
+			fmt.Println("Filling column:", column.ColumnName, "with value:", value, "(dependent column)")
 			continue
 		}
 
@@ -83,22 +97,29 @@ func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.D
 		depValues := getDepValues(tableNode, tableNodes, db)
 
 		// Generate test values to insert into the table
-		sampleValues, sampleTypes := generateSampleEntry(tableNode, depValues)
+		sampleValues, sampleTypes := generateSampleEntryData(tableNode, depValues)
 
 		// Construct and SQL insert statement to insert the sample data
 		insertStatement := fmt.Sprintf("INSERT INTO %s (", tableNode.TableName)
 
 		// Get the column names from the table node
-		for _, column := range tableNode.Columns {
+		for column := range sampleValues {
 			// Skip if the column is an id column
-			if column.ColumnName == "id" {
+			if column == "id" {
 				continue
 			}
 
-			insertStatement += column.ColumnName + ", "
+			insertStatement += column + ", "
 		}
 
+		// Repeat for the dependent values
+		for column := range depValues {
+			insertStatement += column + ", "
+		}
+
+		// Remove the trailing comma and space and prepare the insert statement values
 		insertStatement = insertStatement[:len(insertStatement)-2] + ") VALUES ("
+
 		for columnName, value := range sampleValues {
 
 			//Skip if the column is an id column
@@ -107,22 +128,12 @@ func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.D
 			}
 
 			// Add the value to the insert statement
-			switch sampleTypes[columnName] {
-			case "bigint":
-				insertStatement += fmt.Sprintf("%d, ", value)
-			case "int":
-				insertStatement += fmt.Sprintf("%d, ", value)
-			case "text":
-				insertStatement += fmt.Sprintf("'%s', ", value)
-			case "date":
-				insertStatement += fmt.Sprintf("'%s', ", value)
-			case "boolean":
-				insertStatement += fmt.Sprintf("%t, ", value)
-			case "real":
-				insertStatement += fmt.Sprintf("%f, ", value)
-			case "jsonb":
-				insertStatement += fmt.Sprintf("'%s', ", value)
-			}
+			insertStatement = formatAppendValue(sampleTypes, columnName, insertStatement, value)
+		}
+
+		// Repeat for the dependent values
+		for columnName, value := range depValues {
+			insertStatement = formatAppendValue(sampleTypes, columnName, insertStatement, value)
 		}
 
 		insertStatement = insertStatement[:len(insertStatement)-2] + ");"
@@ -136,6 +147,26 @@ func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.D
 		}
 	}
 
+}
+
+func formatAppendValue(sampleTypes map[string]string, columnName string, insertStatement string, value interface{}) string {
+	switch sampleTypes[columnName] {
+	case "bigint":
+		insertStatement += fmt.Sprintf("%d, ", value)
+	case "int":
+		insertStatement += fmt.Sprintf("%d, ", value)
+	case "text":
+		insertStatement += fmt.Sprintf("'%s', ", value)
+	case "date":
+		insertStatement += fmt.Sprintf("'%s', ", value)
+	case "boolean":
+		insertStatement += fmt.Sprintf("%t, ", value)
+	case "real":
+		insertStatement += fmt.Sprintf("%f, ", value)
+	case "jsonb":
+		insertStatement += fmt.Sprintf("'%s', ", value)
+	}
+	return insertStatement
 }
 
 // Get the dependent values from the parent tables
