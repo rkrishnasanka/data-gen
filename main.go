@@ -91,25 +91,21 @@ func generateDependencyTree(db *sql.DB, tableNodes map[string]*TableNode) {
 		}
 		fmt.Printf("%s : %s.%s.%s -> %s.%s.%s\n", constraintName, schema, table, column, foreignSchema, foreignTable, foreignColumn)
 
-		// Create a new TableNode if it doesn't exist
-		if _, ok := tableNodes[table]; !ok {
-			tableNodes[table] = &TableNode{
-				TableName: table,
-			}
-		}
+		// Create the full table name (current)
+		currentTableName := fmt.Sprintf("%s.%s", schema, table)
 
-		// Create the full table name
-		fullTableName := fmt.Sprintf("%s.%s", foreignSchema, foreignTable)
+		// Create the full table name (foreign)
+		foreignTableName := fmt.Sprintf("%s.%s", foreignSchema, foreignTable)
 
 		// Create a new TableNode if it doesn't exist
-		if _, ok := tableNodes[fullTableName]; !ok {
-			tableNodes[fullTableName] = &TableNode{
-				TableName: fullTableName,
+		if _, ok := tableNodes[currentTableName]; !ok {
+			tableNodes[currentTableName] = &TableNode{
+				TableName: currentTableName,
 			}
 		}
 
 		// Add the foreign table as a child of the table
-		tableNodes[fullTableName].AddChild(tableNodes[table], "fk_constraint_name", foreignColumn, column)
+		tableNodes[currentTableName].AddChild(tableNodes[foreignTableName], constraintName, foreignColumn, column)
 	}
 
 }
@@ -154,7 +150,7 @@ func main() {
 	generateDependencyTree(db, tableNodes)
 
 	// Identify the order of the tables to be filled
-	orderedTables := generateTopologicalSort(tableNodes)
+	orderedTables := generateFillOrder(tableNodes)
 
 	// Print out the order of the tables to be filled
 	fmt.Println("\nOrder of Tables to be Filled:")

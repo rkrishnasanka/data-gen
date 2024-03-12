@@ -15,12 +15,16 @@ func fillTables(rootNodes []*TableNode, tableNodes map[string]*TableNode, db *sq
 	fmt.Println("\nFilling Tables for a new traversal:")
 	for _, rootNode := range rootNodes {
 		fmt.Println("Filling table:", rootNode.TableName)
-		fillTable(rootNode, tableNodes, db, 10)
+		fillTable(rootNode, db, 10)
 	}
 }
 
 // Generate a sample entry for the table
-func generateSampleEntryData(tableNode *TableNode, depValues map[string]interface{}, db *sql.DB) (map[string]interface{}, map[string]string) {
+func generateSampleEntryData(tableNode *TableNode, db *sql.DB) (map[string]interface{}, map[string]string) {
+
+	// TODO: Get the dependent values from the parent tables
+	depValues := getDepValues(tableNode, db)
+
 	// Generate test values to insert into the table
 	sampleValues := make(map[string]interface{})
 	sampleTypes := make(map[string]string)
@@ -29,11 +33,6 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 	for _, column := range tableNode.Columns {
 		// SKip id columns
 		if column.ColumnName == "id" {
-			continue
-		}
-
-		// SKip if the column is a dependent column
-		if _, ok := depValues[column.ColumnName]; ok {
 			continue
 		}
 
@@ -46,17 +45,22 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 			continue
 		}
 
-		fmt.Println("Filling column:", column.ColumnName, "with type:", column.DataType)
-		sampleTypes[column.ColumnName] = column.DataType
-
 		// First check if the column is an enum
 		if CheckIfTypeIsEnum(column.DataType, db) {
+			// Print the column name and data type
 			// Get the enum values
 			enumOptions := GetEnumOptions(column.DataType, db)
 			// Randomly select an enum value
 			sampleValues[column.ColumnName] = enumOptions[rand.Intn(len(enumOptions))]
+			sampleTypes[column.ColumnName] = column.DataType
+
+			//Print the column name and data type
+			fmt.Println("Filling column:", column.ColumnName, "with value:", sampleValues[column.ColumnName], "(enum)")
 			continue
 		}
+
+		fmt.Println("Filling column:", column.ColumnName, "with type:", column.DataType)
+		sampleTypes[column.ColumnName] = column.DataType
 
 		// Generate sample data based on the data type
 		switch column.DataType {
@@ -75,6 +79,8 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 				sampleValues[column.ColumnName] = faker.Email()
 			case "name":
 				sampleValues[column.ColumnName] = faker.Word()
+			case "phone_number":
+				sampleValues[column.ColumnName] = faker.E164PhoneNumber()
 			default:
 				sampleValues[column.ColumnName] = faker.Sentence()
 			}
@@ -88,6 +94,8 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 		case "jsonb":
 			sampleValues[column.ColumnName] = `{"key": "value"}`
 		}
+
+		fmt.Println("Filling column:", column.ColumnName, "with value:", sampleValues[column.ColumnName])
 	}
 
 	return sampleValues, sampleTypes
@@ -95,57 +103,39 @@ func generateSampleEntryData(tableNode *TableNode, depValues map[string]interfac
 }
 
 // Fills the table with sample data, given the number of entries to fill
-func fillTable(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.DB, numEntries int) {
+func fillTable(tableNode *TableNode, db *sql.DB, numEntries int) {
 	fmt.Println("Filling table:", tableNode.TableName)
 
 	for i := 0; i < numEntries; i++ {
 
 		fmt.Println("Filling entry:", i)
 
-		// TODO: Get the dependent values from the parent tables
-		depValues := getDepValues(tableNode, tableNodes, db)
-
 		// Generate test values to insert into the table
-		sampleValues, sampleTypes := generateSampleEntryData(tableNode, depValues, db)
+		sampleValues, sampleTypes := generateSampleEntryData(tableNode, db)
 
-		// Construct and SQL insert statement to insert the sample data
-		insertStatement := fmt.Sprintf("INSERT INTO %s (", tableNode.TableName)
+		insertColumnNames := ""
+
+		insertColumnValues := ""
 
 		// Get the column names from the table node
-		for column := range sampleValues {
-			// Skip if the column is an id column
-			if column == "id" {
-				continue
-			}
-
-			insertStatement += column + ", "
-		}
-
-		// Repeat for the dependent values
-		for column := range depValues {
-			insertStatement += column + ", "
-		}
-
-		// Remove the trailing comma and space and prepare the insert statement values
-		insertStatement = insertStatement[:len(insertStatement)-2] + ") VALUES ("
-
 		for columnName, value := range sampleValues {
-
-			//Skip if the column is an id column
+			// Skip if the column is an id column
 			if columnName == "id" {
 				continue
 			}
 
+			insertColumnNames += columnName + ", "
+
 			// Add the value to the insert statement
-			insertStatement = formatAppendValue(sampleTypes, columnName, insertStatement, value)
+			insertColumnValues = formatAppendValue(sampleTypes, columnName, insertColumnValues, value)
 		}
 
-		// Repeat for the dependent values
-		for columnName, value := range depValues {
-			insertStatement = formatAppendValue(sampleTypes, columnName, insertStatement, value)
-		}
+		// Remove the trailing comma and space
+		insertColumnNames = insertColumnNames[:len(insertColumnNames)-2]
+		insertColumnValues = insertColumnValues[:len(insertColumnValues)-2]
 
-		insertStatement = insertStatement[:len(insertStatement)-2] + ");"
+		// Construct and SQL insert statement to insert the sample data
+		insertStatement := fmt.Sprintf("INSERT INTO %s ( %s ) VALUES ( %s );", tableNode.TableName, insertColumnNames, insertColumnValues)
 
 		fmt.Println("Insert Statement:", insertStatement)
 
@@ -179,7 +169,7 @@ func formatAppendValue(sampleTypes map[string]string, columnName string, insertS
 }
 
 // Get the dependent values from the parent tables
-func getDepValues(tableNode *TableNode, tableNodes map[string]*TableNode, db *sql.DB) map[string]interface{} {
+func getDepValues(tableNode *TableNode, db *sql.DB) map[string]interface{} {
 
 	// Create the returning map
 	depValues := make(map[string]interface{})

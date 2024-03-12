@@ -19,17 +19,18 @@ func CheckIfTypeIsEnum(columnType string, db *sql.DB) bool {
 	defer rows.Close()
 
 	// Iterate over the rows and check if the column type is an enum
+	found := false
 	for rows.Next() {
 		var typname string
 		if err := rows.Scan(&typname); err != nil {
 			panic(err)
 		}
-		return true
+		found = true
 	}
 	if err := rows.Err(); err != nil {
 		panic(err)
 	}
-	return false
+	return found
 }
 
 func GetEnumOptions(columnType string, db *sql.DB) []string {
