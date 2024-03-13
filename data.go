@@ -21,6 +21,9 @@ func fillTables(rootNodes []*TableNode, db *sql.DB) {
 
 // Generate a sample entry for the table
 func generateSampleEntryData(tableNode *TableNode, db *sql.DB) (map[string]interface{}, map[string]string) {
+	//Print name and the number of parent relationships
+	fmt.Println("Table Name:", tableNode.TableName)
+	fmt.Println("Number of parent relationships:", len(tableNode.ParentRelationships))
 
 	// TODO: Get the dependent values from the parent tables
 	depValues := getDepValues(tableNode, db)
@@ -93,6 +96,8 @@ func generateSampleEntryData(tableNode *TableNode, db *sql.DB) (map[string]inter
 			sampleValues[column.ColumnName] = rand.Float64()
 		case "jsonb":
 			sampleValues[column.ColumnName] = `{"key": "value"}`
+		case "timestamp":
+			sampleValues[column.ColumnName] = faker.Timestamp()
 		}
 
 		fmt.Println("Filling column:", column.ColumnName, "with value:", sampleValues[column.ColumnName])

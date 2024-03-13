@@ -205,26 +205,192 @@ fk_xray_check_examination_basic : application.xray_examination.examination_base_
 fk_xray_check_report_attachment_attachment : application.xray_examination.report_attachment -> application.attachment.id
 
 Root Nodes:
-users.users
-users.user_data
 application.laboratory
-users.organization
-application.patient_data_basic
-application.attachment
 core.file_object
-application.examination_event
+users.user_data
+users.organization
+application.attachment
+application.patient_data_basic
+users.users
 core.queues
+application.examination_event
 
 Root Nodes:
-application.attachment
-core.file_object
+application.patient_data_basic
 application.examination_event
+users.users
 core.queues
 application.laboratory
-users.users
+core.file_object
 users.user_data
-application.patient_data_basic
 users.organization
+application.attachment
+
+New Tree:
+application.patient_data_basic
+Foreign Key Constraints:
+application.examination_base
+Foreign Key Constraints:
+    fk_examination_basic_examination_event: application.examination_event.id -> application.examination_base.examination_event_id
+    fk_examination_basic_patient: application.patient_data_basic.id -> application.examination_base.patient_id
+application.audiometry_check
+Foreign Key Constraints:
+        fk_audiometry_check_examination_basic: application.examination_base.id -> application.audiometry_check.examination_base_id
+        fk_audiometry_check_report_attachment_attachment: application.attachment.id -> application.audiometry_check.report_attachment
+application.ecg_check
+Foreign Key Constraints:
+        fk_ecg_check_examination_basic: application.examination_base.id -> application.ecg_check.examination_base_id
+        fk_ecg_check_report_attachment_attachment: application.attachment.id -> application.ecg_check.report_attachment
+application.examination_lab_general
+Foreign Key Constraints:
+        fk_examination_lab_examination_basic: application.examination_base.id -> application.examination_lab_general.examination_base_id
+        fk_examination_lab_report_attachment_attachment: application.attachment.id -> application.examination_lab_general.report_attachment
+application.examination_physical
+Foreign Key Constraints:
+        fk_examination_physical_examination_basic: application.examination_base.id -> application.examination_physical.examination_base_id
+application.examination_vision
+Foreign Key Constraints:
+        fk_examination_vision_examination_basic: application.examination_base.id -> application.examination_vision.examination_base_id
+application.pulmonary_examination
+Foreign Key Constraints:
+        fk_pulmonary_examination_examination_basic: application.examination_base.id -> application.pulmonary_examination.examination_base_id
+        fk_pulmonary_examination_report_attachment_attachment: application.attachment.id -> application.pulmonary_examination.report_attachment
+application.report
+Foreign Key Constraints:
+        fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
+        fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
+application.report_attachment
+Foreign Key Constraints:
+            fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
+            fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
+application.xray_examination
+Foreign Key Constraints:
+        fk_xray_check_examination_basic: application.examination_base.id -> application.xray_examination.examination_base_id
+        fk_xray_check_report_attachment_attachment: application.attachment.id -> application.xray_examination.report_attachment
+
+New Tree:
+application.examination_event
+Foreign Key Constraints:
+application.examination_base
+Foreign Key Constraints:
+    fk_examination_basic_examination_event: application.examination_event.id -> application.examination_base.examination_event_id
+    fk_examination_basic_patient: application.patient_data_basic.id -> application.examination_base.patient_id
+application.audiometry_check
+Foreign Key Constraints:
+        fk_audiometry_check_examination_basic: application.examination_base.id -> application.audiometry_check.examination_base_id
+        fk_audiometry_check_report_attachment_attachment: application.attachment.id -> application.audiometry_check.report_attachment
+application.ecg_check
+Foreign Key Constraints:
+        fk_ecg_check_examination_basic: application.examination_base.id -> application.ecg_check.examination_base_id
+        fk_ecg_check_report_attachment_attachment: application.attachment.id -> application.ecg_check.report_attachment
+application.examination_lab_general
+Foreign Key Constraints:
+        fk_examination_lab_examination_basic: application.examination_base.id -> application.examination_lab_general.examination_base_id
+        fk_examination_lab_report_attachment_attachment: application.attachment.id -> application.examination_lab_general.report_attachment
+application.examination_physical
+Foreign Key Constraints:
+        fk_examination_physical_examination_basic: application.examination_base.id -> application.examination_physical.examination_base_id
+application.examination_vision
+Foreign Key Constraints:
+        fk_examination_vision_examination_basic: application.examination_base.id -> application.examination_vision.examination_base_id
+application.pulmonary_examination
+Foreign Key Constraints:
+        fk_pulmonary_examination_examination_basic: application.examination_base.id -> application.pulmonary_examination.examination_base_id
+        fk_pulmonary_examination_report_attachment_attachment: application.attachment.id -> application.pulmonary_examination.report_attachment
+application.report
+Foreign Key Constraints:
+        fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
+        fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
+application.report_attachment
+Foreign Key Constraints:
+            fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
+            fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
+application.xray_examination
+Foreign Key Constraints:
+        fk_xray_check_examination_basic: application.examination_base.id -> application.xray_examination.examination_base_id
+        fk_xray_check_report_attachment_attachment: application.attachment.id -> application.xray_examination.report_attachment
+
+New Tree:
+users.users
+Foreign Key Constraints:
+users.authenticated_token_pairs
+Foreign Key Constraints:
+    fk_authenticated_token_pairs_user: users.users.id -> users.authenticated_token_pairs.user_id
+users.organization_admin
+Foreign Key Constraints:
+    fk_organization_admin_organization: users.organization.id -> users.organization_admin.organization_id
+    fk_organization_admin_user: users.users.id -> users.organization_admin.user_id
+users.organization_membership
+Foreign Key Constraints:
+    fk_organization_membership_organization: users.organization.id -> users.organization_membership.organization_id
+    fk_organization_membership_user: users.users.id -> users.organization_membership.user_id
+users.team_admin
+Foreign Key Constraints:
+    fk_team_admin_team: users.team.id -> users.team_admin.team_id
+    fk_team_admin_user: users.users.id -> users.team_admin.user_id
+users.team_membership
+Foreign Key Constraints:
+    fk_team_membership_team: users.team.id -> users.team_membership.team_id
+    fk_team_membership_user: users.users.id -> users.team_membership.user_id
+users.user_permissions
+Foreign Key Constraints:
+    fk_permissions_user: users.users.id -> users.user_permissions.user_id
+
+New Tree:
+core.queues
+Foreign Key Constraints:
+core.tasks
+Foreign Key Constraints:
+    fk_task_queue_tasks_id: core.queues.id -> core.tasks.queue_id
+
+New Tree:
+application.laboratory
+Foreign Key Constraints:
+application.report
+Foreign Key Constraints:
+    fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
+    fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
+application.report_attachment
+Foreign Key Constraints:
+        fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
+        fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
+application.test_offering
+Foreign Key Constraints:
+    fk_laboratory_test_laboratory: application.laboratory.id -> application.test_offering.laboratory_id
+
+New Tree:
+core.file_object
+Foreign Key Constraints:
+
+New Tree:
+users.user_data
+Foreign Key Constraints:
+
+New Tree:
+users.organization
+Foreign Key Constraints:
+users.organization_admin
+Foreign Key Constraints:
+    fk_organization_admin_organization: users.organization.id -> users.organization_admin.organization_id
+    fk_organization_admin_user: users.users.id -> users.organization_admin.user_id
+users.organization_membership
+Foreign Key Constraints:
+    fk_organization_membership_organization: users.organization.id -> users.organization_membership.organization_id
+    fk_organization_membership_user: users.users.id -> users.organization_membership.user_id
+users.team
+Foreign Key Constraints:
+    fk_team_organization: users.organization.id -> users.team.organization_id
+users.team_admin
+Foreign Key Constraints:
+        fk_team_admin_team: users.team.id -> users.team_admin.team_id
+        fk_team_admin_user: users.users.id -> users.team_admin.user_id
+users.team_membership
+Foreign Key Constraints:
+        fk_team_membership_team: users.team.id -> users.team_membership.team_id
+        fk_team_membership_user: users.users.id -> users.team_membership.user_id
+users.team_permissions
+Foreign Key Constraints:
+        fk_permissions_team: users.team.id -> users.team_permissions.team_id
 
 New Tree:
 application.attachment
@@ -257,379 +423,39 @@ Foreign Key Constraints:
     fk_xray_check_examination_basic: application.examination_base.id -> application.xray_examination.examination_base_id
     fk_xray_check_report_attachment_attachment: application.attachment.id -> application.xray_examination.report_attachment
 
-New Tree:
-core.file_object
-Foreign Key Constraints:
-
-New Tree:
-application.examination_event
-Foreign Key Constraints:
-application.examination_base
-Foreign Key Constraints:
-    fk_examination_basic_examination_event: application.examination_event.id -> application.examination_base.examination_event_id
-    fk_examination_basic_patient: application.patient_data_basic.id -> application.examination_base.patient_id
-application.audiometry_check
-Foreign Key Constraints:
-        fk_audiometry_check_examination_basic: application.examination_base.id -> application.audiometry_check.examination_base_id
-        fk_audiometry_check_report_attachment_attachment: application.attachment.id -> application.audiometry_check.report_attachment
-application.ecg_check
-Foreign Key Constraints:
-        fk_ecg_check_examination_basic: application.examination_base.id -> application.ecg_check.examination_base_id
-        fk_ecg_check_report_attachment_attachment: application.attachment.id -> application.ecg_check.report_attachment
-application.examination_lab_general
-Foreign Key Constraints:
-        fk_examination_lab_examination_basic: application.examination_base.id -> application.examination_lab_general.examination_base_id
-        fk_examination_lab_report_attachment_attachment: application.attachment.id -> application.examination_lab_general.report_attachment
-application.examination_physical
-Foreign Key Constraints:
-        fk_examination_physical_examination_basic: application.examination_base.id -> application.examination_physical.examination_base_id
-application.examination_vision
-Foreign Key Constraints:
-        fk_examination_vision_examination_basic: application.examination_base.id -> application.examination_vision.examination_base_id
-application.pulmonary_examination
-Foreign Key Constraints:
-        fk_pulmonary_examination_examination_basic: application.examination_base.id -> application.pulmonary_examination.examination_base_id
-        fk_pulmonary_examination_report_attachment_attachment: application.attachment.id -> application.pulmonary_examination.report_attachment
-application.report
-Foreign Key Constraints:
-        fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
-        fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
-application.report_attachment
-Foreign Key Constraints:
-            fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
-            fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
-application.xray_examination
-Foreign Key Constraints:
-        fk_xray_check_examination_basic: application.examination_base.id -> application.xray_examination.examination_base_id
-        fk_xray_check_report_attachment_attachment: application.attachment.id -> application.xray_examination.report_attachment
-
-New Tree:
-core.queues
-Foreign Key Constraints:
-core.tasks
-Foreign Key Constraints:
-    fk_task_queue_tasks_id: core.queues.id -> core.tasks.queue_id
-
-New Tree:
-application.laboratory
-Foreign Key Constraints:
-application.report
-Foreign Key Constraints:
-    fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
-    fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
-application.report_attachment
-Foreign Key Constraints:
-        fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
-        fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
-application.test_offering
-Foreign Key Constraints:
-    fk_laboratory_test_laboratory: application.laboratory.id -> application.test_offering.laboratory_id
-
-New Tree:
-users.users
-Foreign Key Constraints:
-users.authenticated_token_pairs
-Foreign Key Constraints:
-    fk_authenticated_token_pairs_user: users.users.id -> users.authenticated_token_pairs.user_id
-users.organization_admin
-Foreign Key Constraints:
-    fk_organization_admin_organization: users.organization.id -> users.organization_admin.organization_id
-    fk_organization_admin_user: users.users.id -> users.organization_admin.user_id
-users.organization_membership
-Foreign Key Constraints:
-    fk_organization_membership_organization: users.organization.id -> users.organization_membership.organization_id
-    fk_organization_membership_user: users.users.id -> users.organization_membership.user_id
-users.team_admin
-Foreign Key Constraints:
-    fk_team_admin_team: users.team.id -> users.team_admin.team_id
-    fk_team_admin_user: users.users.id -> users.team_admin.user_id
-users.team_membership
-Foreign Key Constraints:
-    fk_team_membership_team: users.team.id -> users.team_membership.team_id
-    fk_team_membership_user: users.users.id -> users.team_membership.user_id
-users.user_permissions
-Foreign Key Constraints:
-    fk_permissions_user: users.users.id -> users.user_permissions.user_id
-
-New Tree:
-users.user_data
-Foreign Key Constraints:
-
-New Tree:
-application.patient_data_basic
-Foreign Key Constraints:
-application.examination_base
-Foreign Key Constraints:
-    fk_examination_basic_examination_event: application.examination_event.id -> application.examination_base.examination_event_id
-    fk_examination_basic_patient: application.patient_data_basic.id -> application.examination_base.patient_id
-application.audiometry_check
-Foreign Key Constraints:
-        fk_audiometry_check_examination_basic: application.examination_base.id -> application.audiometry_check.examination_base_id
-        fk_audiometry_check_report_attachment_attachment: application.attachment.id -> application.audiometry_check.report_attachment
-application.ecg_check
-Foreign Key Constraints:
-        fk_ecg_check_examination_basic: application.examination_base.id -> application.ecg_check.examination_base_id
-        fk_ecg_check_report_attachment_attachment: application.attachment.id -> application.ecg_check.report_attachment
-application.examination_lab_general
-Foreign Key Constraints:
-        fk_examination_lab_examination_basic: application.examination_base.id -> application.examination_lab_general.examination_base_id
-        fk_examination_lab_report_attachment_attachment: application.attachment.id -> application.examination_lab_general.report_attachment
-application.examination_physical
-Foreign Key Constraints:
-        fk_examination_physical_examination_basic: application.examination_base.id -> application.examination_physical.examination_base_id
-application.examination_vision
-Foreign Key Constraints:
-        fk_examination_vision_examination_basic: application.examination_base.id -> application.examination_vision.examination_base_id
-application.pulmonary_examination
-Foreign Key Constraints:
-        fk_pulmonary_examination_examination_basic: application.examination_base.id -> application.pulmonary_examination.examination_base_id
-        fk_pulmonary_examination_report_attachment_attachment: application.attachment.id -> application.pulmonary_examination.report_attachment
-application.report
-Foreign Key Constraints:
-        fk_report_examination_base: application.examination_base.id -> application.report.examination_base_id
-        fk_report_laboratory: application.laboratory.id -> application.report.laboratory_id
-application.report_attachment
-Foreign Key Constraints:
-            fk_report_attachment_attachment: application.attachment.id -> application.report_attachment.attachment_id
-            fk_report_attachment_report: application.report.id -> application.report_attachment.report_id
-application.xray_examination
-Foreign Key Constraints:
-        fk_xray_check_examination_basic: application.examination_base.id -> application.xray_examination.examination_base_id
-        fk_xray_check_report_attachment_attachment: application.attachment.id -> application.xray_examination.report_attachment
-
-New Tree:
-users.organization
-Foreign Key Constraints:
-users.organization_admin
-Foreign Key Constraints:
-    fk_organization_admin_organization: users.organization.id -> users.organization_admin.organization_id
-    fk_organization_admin_user: users.users.id -> users.organization_admin.user_id
-users.organization_membership
-Foreign Key Constraints:
-    fk_organization_membership_organization: users.organization.id -> users.organization_membership.organization_id
-    fk_organization_membership_user: users.users.id -> users.organization_membership.user_id
-users.team
-Foreign Key Constraints:
-    fk_team_organization: users.organization.id -> users.team.organization_id
-users.team_admin
-Foreign Key Constraints:
-        fk_team_admin_team: users.team.id -> users.team_admin.team_id
-        fk_team_admin_user: users.users.id -> users.team_admin.user_id
-users.team_membership
-Foreign Key Constraints:
-        fk_team_membership_team: users.team.id -> users.team_membership.team_id
-        fk_team_membership_user: users.users.id -> users.team_membership.user_id
-users.team_permissions
-Foreign Key Constraints:
-        fk_permissions_team: users.team.id -> users.team_permissions.team_id
-
 Order of Tables to be Filled:
-users.users
-users.user_permissions
-users.team_membership
-users.team_admin
-users.organization_membership
-users.organization_admin
-users.authenticated_token_pairs
-users.user_data
 application.laboratory
 application.test_offering
 application.report
 application.report_attachment
+core.file_object
+users.user_data
 users.organization
 users.team
 users.team_permissions
-application.patient_data_basic
-application.examination_base
+users.team_membership
+users.team_admin
+users.organization_membership
+users.organization_admin
+application.attachment
 application.xray_examination
 application.pulmonary_examination
-application.examination_vision
-application.examination_physical
 application.examination_lab_general
 application.ecg_check
-application.audiometry_check
-application.attachment
 application.doctor_final_certification
-core.file_object
-application.examination_event
+application.audiometry_check
+application.patient_data_basic
+application.examination_base
+application.examination_vision
+application.examination_physical
+users.users
+users.user_permissions
+users.authenticated_token_pairs
 core.queues
 core.tasks
+application.examination_event
 
 Filling Tables for a new traversal:
-Filling table: users.users
-Filling table: users.users
+Filling table: application.laboratory
+Filling table: application.laboratory
 Filling entry: 0
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Geraldine
-Filling column: email with type: text
-Filling column: email with value: OJtTkMR@oTnRLHq.edu
-Filling column: last_name with type: text
-Filling column: last_name with value: Lebsack
-Filling column: role with type: text
-Filling column: role with value: Atque eligendi sapiente dolores quidem fugiat.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Doloribus incidunt nobis quam nihil numquam.
-Insert Statement: INSERT INTO users.users ( password, verified, first_name, email, last_name, role ) VALUES ( 'Doloribus incidunt nobis quam nihil numquam.', true, 'Geraldine', 'OJtTkMR@oTnRLHq.edu', 'Lebsack', 'Atque eligendi sapiente dolores quidem fugiat.' );
-Filling entry: 1
-Filling column: verified with type: boolean
-Filling column: verified with value: false
-Filling column: first_name with type: text
-Filling column: first_name with value: Randi
-Filling column: email with type: text
-Filling column: email with value: NiZHhRQ@Hkdnlpl.top
-Filling column: last_name with type: text
-Filling column: last_name with value: Krajcik
-Filling column: role with type: text
-Filling column: role with value: At tenetur eos dolorem accusamus cupiditate.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Dicta minima blanditiis reprehenderit ut quaerat.
-Insert Statement: INSERT INTO users.users ( last_name, role, password, verified, first_name, email ) VALUES ( 'Krajcik', 'At tenetur eos dolorem accusamus cupiditate.', 'Dicta minima blanditiis reprehenderit ut quaerat.', false, 'Randi', 'NiZHhRQ@Hkdnlpl.top' );
-Filling entry: 2
-Filling column: verified with type: boolean
-Filling column: verified with value: false
-Filling column: first_name with type: text
-Filling column: first_name with value: Imelda
-Filling column: email with type: text
-Filling column: email with value: BYdXRpw@xrIhJOc.top
-Filling column: last_name with type: text
-Filling column: last_name with value: Reichert
-Filling column: role with type: text
-Filling column: role with value: Autem ut nemo cum optio sit.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Architecto et dicta et animi quis.
-Insert Statement: INSERT INTO users.users ( last_name, role, password, verified, first_name, email ) VALUES ( 'Reichert', 'Autem ut nemo cum optio sit.', 'Architecto et dicta et animi quis.', false, 'Imelda', 'BYdXRpw@xrIhJOc.top' );
-Filling entry: 3
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Oliver
-Filling column: email with type: text
-Filling column: email with value: PevpIMD@aXBlILZ.edu
-Filling column: last_name with type: text
-Filling column: last_name with value: Rice
-Filling column: role with type: text
-Filling column: role with value: Beatae nostrum omnis ab eaque occaecati.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Similique necessitatibus ipsa fugit ratione explicabo.
-Insert Statement: INSERT INTO users.users ( last_name, role, password, verified, first_name, email ) VALUES ( 'Rice', 'Beatae nostrum omnis ab eaque occaecati.', 'Similique necessitatibus ipsa fugit ratione explicabo.', true, 'Oliver', 'PevpIMD@aXBlILZ.edu' );
-Filling entry: 4
-Filling column: verified with type: boolean
-Filling column: verified with value: false
-Filling column: first_name with type: text
-Filling column: first_name with value: Tanya
-Filling column: email with type: text
-Filling column: email with value: jJTDrwn@RIfNiOJ.top
-Filling column: last_name with type: text
-Filling column: last_name with value: Heidenreich
-Filling column: role with type: text
-Filling column: role with value: Laborum aut omnis eum aut sint.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Est id ut omnis qui libero.
-Insert Statement: INSERT INTO users.users ( password, verified, first_name, email, last_name, role ) VALUES ( 'Est id ut omnis qui libero.', false, 'Tanya', 'jJTDrwn@RIfNiOJ.top', 'Heidenreich', 'Laborum aut omnis eum aut sint.' );
-Filling entry: 5
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Mariah
-Filling column: email with type: text
-Filling column: email with value: mKxvAut@ZKSeAIY.biz
-Filling column: last_name with type: text
-Filling column: last_name with value: Friesen
-Filling column: role with type: text
-Filling column: role with value: Unde odit et rerum totam debitis.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Deleniti ut a reprehenderit soluta vel.
-Insert Statement: INSERT INTO users.users ( first_name, email, last_name, role, password, verified ) VALUES ( 'Mariah', 'mKxvAut@ZKSeAIY.biz', 'Friesen', 'Unde odit et rerum totam debitis.', 'Deleniti ut a reprehenderit soluta vel.', true );
-Filling entry: 6
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Orrin
-Filling column: email with type: text
-Filling column: email with value: yrvOUoi@QdJdiWh.org
-Filling column: last_name with type: text
-Filling column: last_name with value: Haag
-Filling column: role with type: text
-Filling column: role with value: Sint qui officia error omnis dolorem.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Asperiores excepturi aut ratione aut saepe.
-Insert Statement: INSERT INTO users.users ( role, password, verified, first_name, email, last_name ) VALUES ( 'Sint qui officia error omnis dolorem.', 'Asperiores excepturi aut ratione aut saepe.', true, 'Orrin', 'yrvOUoi@QdJdiWh.org', 'Haag' );
-Filling entry: 7
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Elinor
-Filling column: email with type: text
-Filling column: email with value: faEPyOm@VoaghGE.biz
-Filling column: last_name with type: text
-Filling column: last_name with value: Hansen
-Filling column: role with type: text
-Filling column: role with value: Est dolor ut autem fugit accusamus.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Reprehenderit soluta aut laudantium debitis officia.
-Insert Statement: INSERT INTO users.users ( email, last_name, role, password, verified, first_name ) VALUES ( 'faEPyOm@VoaghGE.biz', 'Hansen', 'Est dolor ut autem fugit accusamus.', 'Reprehenderit soluta aut laudantium debitis officia.', true, 'Elinor' );
-Filling entry: 8
-Filling column: verified with type: boolean
-Filling column: verified with value: false
-Filling column: first_name with type: text
-Filling column: first_name with value: Gardner
-Filling column: email with type: text
-Filling column: email with value: oZxudWf@OdcbuKF.net
-Filling column: last_name with type: text
-Filling column: last_name with value: Larson
-Filling column: role with type: text
-Filling column: role with value: Ipsam tempore dicta quod et voluptates.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Qui dolorum asperiores ad magnam molestiae.
-Insert Statement: INSERT INTO users.users ( verified, first_name, email, last_name, role, password ) VALUES ( false, 'Gardner', 'oZxudWf@OdcbuKF.net', 'Larson', 'Ipsam tempore dicta quod et voluptates.', 'Qui dolorum asperiores ad magnam molestiae.' );
-Filling entry: 9
-Filling column: verified with type: boolean
-Filling column: verified with value: true
-Filling column: first_name with type: text
-Filling column: first_name with value: Sally
-Filling column: email with type: text
-Filling column: email with value: SZaqpLF@sLbknyl.com
-Filling column: last_name with type: text
-Filling column: last_name with value: Beier
-Filling column: role with type: text
-Filling column: role with value: Maiores necessitatibus magni minima sunt natus.
-Filling column: created_at with type: timestamp without time zone
-Filling column: created_at with value: <nil>
-Filling column: password with type: text
-Filling column: password with value: Maiores consequatur facere sint voluptatem aut.
-Insert Statement: INSERT INTO users.users ( email, last_name, role, password, verified, first_name ) VALUES ( 'SZaqpLF@sLbknyl.com', 'Beier', 'Maiores necessitatibus magni minima sunt natus.', 'Maiores consequatur facere sint voluptatem aut.', true, 'Sally' );
-Filling table: users.user_permissions
-Filling table: users.user_permissions
-Filling entry: 0
-Filling column: write with type: boolean
-Filling column: write with value: false
-Filling column: resource_id with type: bigint
-Filling column: resource_id with value: 5416077202292649734
-Filling column: execute with type: boolean
-Filling column: execute with value: true
-Filling column: resource with type: text
-Filling column: resource with value: Velit eos consectetur odit recusandae incidunt.
-Filling column: user_id with value: <nil> (dependent column)
-Filling column: read with type: boolean
-Filling column: read with value: false
-Insert Statement: INSERT INTO users.user_permissions ( resource, user_id, read, write, resource_id, execute ) VALUES ( 'Velit eos consectetur odit recusandae incidunt.', %!d(<nil>), false, false, 5416077202292649734, true );

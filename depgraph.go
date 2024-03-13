@@ -54,6 +54,7 @@ func (t *TableNode) CreateTableNode(tableName string) *TableNode {
 	}
 }
 
+// Returns list of nodes in topological order
 func generateFillOrder(tableNodes map[string]*TableNode) []*TableNode {
 	// Identify the root nodes
 	fillOrder := make([]*TableNode, 0)
@@ -85,6 +86,7 @@ func generateFillOrder(tableNodes map[string]*TableNode) []*TableNode {
 	return fillOrder
 }
 
+// Traverse the tree using depth first search
 func dfsTraverse(tableNode *TableNode, fillOrder *[]*TableNode, visited map[*TableNode]bool, stack *stack.Stack) {
 	// Mark the current node as visited
 	visited[tableNode] = true
@@ -106,6 +108,7 @@ func reverse(nodes []*TableNode) {
 	}
 }
 
+// Print the node
 func PrintNode(tableNode *TableNode, level int) {
 	// Print the table name
 	for i := 0; i < level; i++ {
@@ -124,6 +127,7 @@ func PrintNode(tableNode *TableNode, level int) {
 
 }
 
+// Print the tree
 func PrintTree(tableNodes map[string]*TableNode) {
 	// Identify the root nodes
 	rootNodes := make([]*TableNode, 0)
@@ -145,6 +149,7 @@ func PrintTree(tableNodes map[string]*TableNode) {
 	}
 }
 
+// Print the children (this is the recursively called function)
 func printChildren(tableNode *TableNode, level int) {
 	// Print the children
 	for _, child := range tableNode.Children {
