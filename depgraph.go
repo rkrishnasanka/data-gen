@@ -80,8 +80,6 @@ func generateFillOrder(tableNodes map[string]*TableNode) []*TableNode {
 			fillOrder = append(fillOrder, stack.Pop().(*TableNode))
 		}
 
-		reverse(fillOrder)
-
 	}
 
 	return fillOrder

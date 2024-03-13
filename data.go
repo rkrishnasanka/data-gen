@@ -10,7 +10,7 @@ import (
 )
 
 // Fills the tables with sample data
-func fillTables(rootNodes []*TableNode, tableNodes map[string]*TableNode, db *sql.DB) {
+func fillTables(rootNodes []*TableNode, db *sql.DB) {
 	// Iterate over the root nodes and fill the tables
 	fmt.Println("\nFilling Tables for a new traversal:")
 	for _, rootNode := range rootNodes {
@@ -182,25 +182,28 @@ func getDepValues(tableNode *TableNode, db *sql.DB) map[string]interface{} {
 		parentColumnName := parent.ParentColumn
 		chilColumnName := parent.ChildColumn
 
+		// Construct the SQL query to select a random row from the parent table
+		selectQuery := fmt.Sprintf("SELECT %s FROM %s ORDER BY RANDOM() LIMIT 1;", parentColumnName, parentTableName)
+
+		// Print the select query
+		fmt.Println("Select Query:", selectQuery)
+
 		// Randomly select the row from the parent table
-		rows, err := db.Query(fmt.Sprintf("SELECT %s FROM %s ORDER BY RANDOM() LIMIT 1;", parentColumnName, parentTableName))
+		rows, err := db.Query(selectQuery)
 
 		if err != nil {
 			panic(err)
 		}
 
-		// Panic if the rows are empty
-		if !rows.Next() {
-			panic(fmt.Sprintf("No rows in table: %s", parentTableName))
-		}
+		defer rows.Close()
 
 		// Get the column value
 		var columnValue interface{}
-		for rows.Next() {
-			rows.Scan(&columnValue)
+		if !rows.Next() {
+			panic("No rows in result set")
 		}
 
-		// Add the column value to the dependent values
+		rows.Scan(&columnValue) // Add the column value to the dependent values
 		depValues[chilColumnName] = columnValue
 
 	}

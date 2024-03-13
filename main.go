@@ -155,6 +155,6 @@ func main() {
 	}
 
 	// Fill the tables with sample data
-	fillTables(orderedTables, tableNodes, db)
+	fillTables(orderedTables, db)
 
 }
